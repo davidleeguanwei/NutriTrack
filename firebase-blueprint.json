@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "userProfiles": {
+      "title": "UserProfile",
+      "description": "User profile containing BMR, TDEE, age, height, weight, activity level, custom goals, water settings.",
+      "properties": {
+        "userId": { "type": "string", "description": "User ID" },
+        "gender": { "type": "string", "description": "male or female" },
+        "age": { "type": "number", "description": "Age in years" },
+        "height": { "type": "number", "description": "Height in cm" },
+        "weight": { "type": "number", "description": "Weight in kg" },
+        "activityLevel": { "type": "string", "description": "sedentary, light, moderate, active, veryActive" },
+        "bmr": { "type": "number", "description": "Calculated BMR calories" },
+        "tdee": { "type": "number", "description": "Calculated TDEE calories" },
+        "customCalorieTarget": { "type": "number", "description": "Custom daily target calorie limit" },
+        "waterCupVolumeMl": { "type": "number", "description": "Water volume per cup in ml" },
+        "waterDailyCupsTarget": { "type": "number", "description": "Daily target cups" },
+        "updatedAt": { "type": "string", "description": "ISO Timestamp" }
+      },
+      "required": ["userId"]
+    },
+    "foodLogs": {
+      "title": "FoodLog",
+      "description": "Daily food entry log",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "mealType": { "type": "string", "description": "breakfast, lunch, dinner, snack" },
+        "foodName": { "type": "string" },
+        "calories": { "type": "number" },
+        "proteinGrams": { "type": "number" },
+        "carbsGrams": { "type": "number" },
+        "fatGrams": { "type": "number" },
+        "fiberGrams": { "type": "number" },
+        "servingAmount": { "type": "number" },
+        "servingUnit": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "date", "foodName", "calories"]
+    },
+    "weightLogs": {
+      "title": "WeightLog",
+      "description": "Daily weight tracking log",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "weightKg": { "type": "number" },
+        "note": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "date", "weightKg"]
+    },
+    "waterLogs": {
+      "title": "WaterLog",
+      "description": "Daily water intake log",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "cups": { "type": "number" },
+        "cupVolumeMl": { "type": "number" },
+        "totalMl": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "date", "cups"]
+    },
+    "favoriteFoods": {
+      "title": "FavoriteFood",
+      "description": "User saved favorite food items list",
+      "properties": {
+        "userId": { "type": "string" },
+        "foodName": { "type": "string" },
+        "calories": { "type": "number" },
+        "proteinGrams": { "type": "number" },
+        "carbsGrams": { "type": "number" },
+        "fatGrams": { "type": "number" },
+        "defaultServingUnit": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "foodName", "calories"]
+    }
+  }
+}

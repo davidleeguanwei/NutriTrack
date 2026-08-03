@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "databaseId": "ai-studio-nutritrack-d823d0f9-29f5-4318-a9c3-ec9d3697b544",
+    "rules": "firestore.rules",
+    "edition": "ENTERPRISE",
+    "dataAccessMode": "FIRESTORE_NATIVE"
+  }
+}
