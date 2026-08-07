@@ -1,14 +1,14 @@
 import React from 'react';
-import { 
-  Flame, 
-  Target, 
-  Droplet, 
-  Scale, 
-  Plus, 
-  Utensils, 
-  Sparkles, 
-  AlertCircle, 
-  CheckCircle2, 
+import {
+  Flame,
+  Target,
+  Droplet,
+  Scale,
+  Plus,
+  Utensils,
+  Sparkles,
+  AlertCircle,
+  CheckCircle2,
   ChevronRight,
   PieChart as PieIcon,
   Zap
@@ -43,17 +43,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onQuickAddFavoriteFood,
   onNavigateTab,
 }) => {
+  const roundToOne = (num: number) => Math.round(num * 10) / 10;
+
   // Calorie calculations
-  const totalCalories = foodLogs.reduce((acc, item) => acc + (item.calories || 0), 0);
-  const totalProtein = foodLogs.reduce((acc, item) => acc + (item.proteinGrams || 0), 0);
-  const totalCarbs = foodLogs.reduce((acc, item) => acc + (item.carbsGrams || 0), 0);
-  const totalFat = foodLogs.reduce((acc, item) => acc + (item.fatGrams || 0), 0);
-  const totalFiber = foodLogs.reduce((acc, item) => acc + (item.fiberGrams || 0), 0);
+  const totalCalories = roundToOne(foodLogs.reduce((acc, item) => acc + (item.calories || 0), 0));
+  const totalProtein = roundToOne(foodLogs.reduce((acc, item) => acc + (item.proteinGrams || 0), 0));
+  const totalCarbs = roundToOne(foodLogs.reduce((acc, item) => acc + (item.carbsGrams || 0), 0));
+  const totalFat = roundToOne(foodLogs.reduce((acc, item) => acc + (item.fatGrams || 0), 0));
+  const totalFiber = roundToOne(foodLogs.reduce((acc, item) => acc + (item.fiberGrams || 0), 0));
 
   // Targets
   const bmr = profile.bmr || 1400;
-  const tdeeLimit = profile.useCustomTarget && profile.customCalorieTarget > 0 
-    ? profile.customCalorieTarget 
+  const tdeeLimit = profile.useCustomTarget && profile.customCalorieTarget > 0
+    ? profile.customCalorieTarget
     : (profile.tdee || 1800);
 
   // BMR gap: how much more calories needed to hit BMR
@@ -65,16 +67,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const isOverTdee = caloriesRemainingTdee < 0;
 
   // Meal type calories breakdown
-  const breakfastCals = foodLogs.filter(f => f.mealType === 'breakfast').reduce((a, b) => a + b.calories, 0);
-  const lunchCals = foodLogs.filter(f => f.mealType === 'lunch').reduce((a, b) => a + b.calories, 0);
-  const dinnerCals = foodLogs.filter(f => f.mealType === 'dinner').reduce((a, b) => a + b.calories, 0);
-  const snackCals = foodLogs.filter(f => f.mealType === 'snack').reduce((a, b) => a + b.calories, 0);
+  const breakfastCals = roundToOne(foodLogs.filter(f => f.mealType === 'breakfast').reduce((a, b) => a + b.calories, 0));
+  const lunchCals = roundToOne(foodLogs.filter(f => f.mealType === 'lunch').reduce((a, b) => a + b.calories, 0));
+  const dinnerCals = roundToOne(foodLogs.filter(f => f.mealType === 'dinner').reduce((a, b) => a + b.calories, 0));
+  const snackCals = roundToOne(foodLogs.filter(f => f.mealType === 'snack').reduce((a, b) => a + b.calories, 0));
 
   // Macro calories
-  const proteinCals = totalProtein * 4;
-  const carbsCals = totalCarbs * 4;
-  const fatCals = totalFat * 9;
-  const totalMacroCals = proteinCals + carbsCals + fatCals || 1;
+  const proteinCals = roundToOne(totalProtein * 4);
+  const carbsCals = roundToOne(totalCarbs * 4);
+  const fatCals = roundToOne(totalFat * 9);
+  const totalMacroCals = roundToOne(proteinCals + carbsCals + fatCals) || 1;
 
   const proteinPct = Math.round((proteinCals / totalMacroCals) * 100);
   const carbsPct = Math.round((carbsCals / totalMacroCals) * 100);
@@ -130,7 +132,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Top Main Cards: BMR & TDEE Calorie Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        
+
         {/* Card 1: Consumed Calories & Progress Bar */}
         <div id="card-consumed-calories" className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -157,14 +159,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 relative border border-slate-200">
-              <div 
-                className={`h-full rounded-full transition-all duration-500 ${
-                  isOverTdee 
-                    ? 'bg-rose-500' 
-                    : hasReachedBmr 
-                      ? 'bg-emerald-500' 
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${isOverTdee
+                    ? 'bg-rose-500'
+                    : hasReachedBmr
+                      ? 'bg-emerald-500'
                       : 'bg-amber-500'
-                }`}
+                  }`}
                 style={{ width: `${Math.min(100, (totalCalories / tdeeLimit) * 100)}%` }}
               />
             </div>
@@ -255,11 +256,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </span>
           </div>
 
-          <div className={`p-4 rounded-xl my-1 border ${
-            isOverTdee 
-              ? 'bg-rose-50 border-rose-200 text-rose-800' 
+          <div className={`p-4 rounded-xl my-1 border ${isOverTdee
+              ? 'bg-rose-50 border-rose-200 text-rose-800'
               : 'bg-slate-50 border-slate-200 text-slate-800'
-          }`}>
+            }`}>
             {isOverTdee ? (
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
@@ -304,7 +304,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Middle Section: Macronutrients Breakdown & Meal Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        
+
         {/* Macronutrients Card */}
         <div id="card-macronutrients" className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -326,17 +326,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             <div className="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex p-0.5 gap-0.5 border border-slate-200">
-              <div 
+              <div
                 className="h-full bg-blue-500 rounded-l-full transition-all duration-300"
                 style={{ width: `${proteinPct}%` }}
                 title={`蛋白質 ${totalProtein}g (${proteinPct}%)`}
               />
-              <div 
+              <div
                 className="h-full bg-amber-400 transition-all duration-300"
                 style={{ width: `${carbsPct}%` }}
                 title={`澱粉/碳水 ${totalCarbs}g (${carbsPct}%)`}
               />
-              <div 
+              <div
                 className="h-full bg-rose-400 rounded-r-full transition-all duration-300"
                 style={{ width: `${fatPct}%` }}
                 title={`脂肪 ${totalFat}g (${fatPct}%)`}
@@ -443,7 +443,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Bottom Section: Water Quick Tracker & Weight Tracker Quick Widget */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        
+
         {/* Water Intake Tracker Quick Widget */}
         <div id="card-water-quick-widget" className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs">
           <div className="flex items-center justify-between">
