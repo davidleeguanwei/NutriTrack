@@ -5,6 +5,7 @@ import { FoodLog, MealType, FavoriteFood } from '../types';
 interface AddFoodModalProps {
   isOpen: boolean;
   onClose: () => void;
+  defaultMealType: MealType;
   selectedDate: string;
   favoriteFoods: FavoriteFood[];
   onAddFood: (foodLog: Omit<FoodLog, 'id'>, saveToFavorites: boolean) => Promise<void>;
@@ -13,13 +14,20 @@ interface AddFoodModalProps {
 export const AddFoodModal: React.FC<AddFoodModalProps> = ({
   isOpen,
   onClose,
+  defaultMealType,
   selectedDate,
   favoriteFoods,
   onAddFood,
 }) => {
   if (!isOpen) return null;
 
-  const [mealType, setMealType] = useState<MealType>('lunch');
+  React.useEffect(() => {
+    if (isOpen) {
+      setMealType(defaultMealType);
+    }
+  }, [isOpen, defaultMealType]);
+
+  const [mealType, setMealType] = useState<MealType>(defaultMealType);
   const [foodName, setFoodName] = useState('');
   const [calories, setCalories] = useState<string>('');
   const [proteinGrams, setProteinGrams] = useState<string>('0');
@@ -158,11 +166,10 @@ export const AddFoodModal: React.FC<AddFoodModalProps> = ({
                   key={m.id}
                   type="button"
                   onClick={() => setMealType(m.id as MealType)}
-                  className={`py-2 px-3 rounded-xl font-bold border transition-all ${
-                    mealType === m.id
+                  className={`py-2 px-3 rounded-xl font-bold border transition-all ${mealType === m.id
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-2xs'
                       : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   {m.label}
                 </button>

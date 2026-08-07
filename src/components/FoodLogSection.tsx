@@ -1,11 +1,11 @@
 import React from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  Sparkles, 
-  Coffee, 
-  Sun, 
-  Moon, 
+import {
+  Plus,
+  Trash2,
+  Sparkles,
+  Coffee,
+  Sun,
+  Moon,
   Cookie
 } from 'lucide-react';
 import { FoodLog, MealType, FavoriteFood } from '../types';
@@ -15,7 +15,7 @@ interface FoodLogSectionProps {
   foodLogs: FoodLog[];
   selectedDate: string;
   favoriteFoods: FavoriteFood[];
-  onOpenAddModal: () => void;
+  onOpenAddModal: (defaultMeal?: MealType) => void;
   onDeleteLog: (id: string) => void;
   onQuickAddFavoriteFood: (fav: FavoriteFood) => void;
 }
@@ -28,10 +28,11 @@ export const FoodLogSection: React.FC<FoodLogSectionProps> = ({
   onDeleteLog,
   onQuickAddFavoriteFood,
 }) => {
-  const totalCalories = foodLogs.reduce((acc, item) => acc + item.calories, 0);
-  const totalProtein = foodLogs.reduce((acc, item) => acc + item.proteinGrams, 0);
-  const totalCarbs = foodLogs.reduce((acc, item) => acc + item.carbsGrams, 0);
-  const totalFat = foodLogs.reduce((acc, item) => acc + item.fatGrams, 0);
+  const roundToOne = (num: number) => Math.round(num * 10) / 10;
+  const totalCalories = roundToOne(foodLogs.reduce((acc, item) => acc + item.calories, 0));
+  const totalProtein = roundToOne(foodLogs.reduce((acc, item) => acc + item.proteinGrams, 0));
+  const totalCarbs = roundToOne(foodLogs.reduce((acc, item) => acc + item.carbsGrams, 0));
+  const totalFat = roundToOne(foodLogs.reduce((acc, item) => acc + item.fatGrams, 0));
 
   const meals: { id: MealType; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'breakfast', label: '早餐 (Breakfast)', icon: <Coffee className="w-4 h-4 text-amber-600" />, color: 'amber' },
@@ -55,16 +56,16 @@ export const FoodLogSection: React.FC<FoodLogSectionProps> = ({
             飲食日記與成分詳細資訊
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            當日紀錄熱量：<strong className="text-emerald-600 font-bold">{totalCalories}</strong> kcal | 
-            蛋白質 <strong className="text-blue-600">{totalProtein}g</strong> | 
-            碳水 <strong className="text-amber-600">{totalCarbs}g</strong> | 
+            當日紀錄熱量：<strong className="text-emerald-600 font-bold">{totalCalories}</strong> kcal |
+            蛋白質 <strong className="text-blue-600">{totalProtein}g</strong> |
+            碳水 <strong className="text-amber-600">{totalCarbs}g</strong> |
             脂肪 <strong className="text-rose-600">{totalFat}g</strong>
           </p>
         </div>
 
         <button
           id="add-food-log-section-btn"
-          onClick={onOpenAddModal}
+          onClick={() => onOpenAddModal()}
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -123,7 +124,7 @@ export const FoodLogSection: React.FC<FoodLogSectionProps> = ({
                     {mealCalories} kcal
                   </span>
                   <button
-                    onClick={onOpenAddModal}
+                    onClick={() => onOpenAddModal(meal.id)}
                     className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-slate-100 transition-colors"
                     title="在此餐別新增紀錄"
                   >

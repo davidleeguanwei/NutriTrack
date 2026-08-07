@@ -13,7 +13,7 @@ import {
   PieChart as PieIcon,
   Zap
 } from 'lucide-react';
-import { UserProfile, FoodLog, WaterLog, WeightLog, FavoriteFood } from '../types';
+import { UserProfile, FoodLog, WaterLog, WeightLog, FavoriteFood, MealType } from '../types';
 import { formatDateLabel } from '../lib/calculator';
 
 interface DashboardProps {
@@ -26,7 +26,7 @@ interface DashboardProps {
   onOpenAddFoodModal: () => void;
   onUpdateWaterCups: (newCups: number) => void;
   onQuickLogWeight: (weight: number) => void;
-  onQuickAddFavoriteFood: (fav: FavoriteFood) => void;
+  onQuickAddFavoriteFood: (fav: FavoriteFood, mealType: MealType) => void;
   onNavigateTab: (tab: string) => void;
 }
 
@@ -97,6 +97,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
   };
 
+  const [quickMealType, setQuickMealType] = React.useState<MealType>('lunch');
+
+  const mealOptions: { id: MealType; label: string; color: string }[] = [
+    { id: 'breakfast', label: '早餐', color: 'amber' },
+    { id: 'lunch', label: '午餐', color: 'emerald' },
+    { id: 'dinner', label: '晚餐', color: 'blue' },
+    { id: 'snack', label: '點心', color: 'purple' },
+  ];
+
   return (
     <div id="dashboard-view" className="space-y-6 animate-fade-in">
       {/* Date banner & Greeting */}
@@ -161,10 +170,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 relative border border-slate-200">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${isOverTdee
-                    ? 'bg-rose-500'
-                    : hasReachedBmr
-                      ? 'bg-emerald-500'
-                      : 'bg-amber-500'
+                  ? 'bg-rose-500'
+                  : hasReachedBmr
+                    ? 'bg-emerald-500'
+                    : 'bg-amber-500'
                   }`}
                 style={{ width: `${Math.min(100, (totalCalories / tdeeLimit) * 100)}%` }}
               />
@@ -257,8 +266,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           <div className={`p-4 rounded-xl my-1 border ${isOverTdee
-              ? 'bg-rose-50 border-rose-200 text-rose-800'
-              : 'bg-slate-50 border-slate-200 text-slate-800'
+            ? 'bg-rose-50 border-rose-200 text-rose-800'
+            : 'bg-slate-50 border-slate-200 text-slate-800'
             }`}>
             {isOverTdee ? (
               <div className="flex items-start gap-2">
@@ -559,33 +568,66 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900">常吃食物一鍵快加入</h3>
-                <p className="text-xs text-slate-500">點擊直接紀錄至今日飲食</p>
+                <p className="text-xs text-slate-500">點擊直接紀錄</p>
               </div>
             </div>
 
+            {/* 餐別切換按鈕群 */}
+            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+              {mealOptions.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setQuickMealType(m.id as MealType)}
+                  className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all ${quickMealType === m.id
+                      ? 'bg-white text-emerald-600 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-1.5 max-h-[110px] overflow-y-auto pr-1">
+            {favoriteFoods.length > 0 ? (
+              favoriteFoods.slice(0, 6).map((fav) => (
+                <button
+                  key={fav.id || fav.foodName}
+                  onClick={() => onQuickAddFavoriteFood(fav, quickMealType)}
+                  className="px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-xs text-slate-800 hover:text-emerald-700 transition-all text-left flex items-center justify-between gap-2 group shadow-2xs"
+                  title={`點擊加入 ${fav.foodName} (${fav.calories} kcal)`}
+                >
+                  <span className="font-semibold">{fav.foodName}</span>
+                  <span className="text-[10px] font-bold text-emerald-600">
+                    +{fav.calories}k
+                  </span>
+                </button>
+              ))
+            ) : (
+              <div className="w-full py-4 text-center">
+                <p className="text-[11px] text-slate-400 italic">尚未設定常吃食物</p>
+                <button
+                  onClick={() => onNavigateTab('favorites')}
+                  className="text-[10px] text-emerald-600 hover:underline mt-1 font-medium"
+                >
+                  前往設定
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex justify-between items-center">
+            <span className="text-[10px] text-slate-400">
+              目前將存入：<span className="font-bold text-emerald-600">{mealOptions.find(o => o.id === quickMealType)?.label}</span>
+            </span>
             <button
-              id="fav-food-detail-link"
               onClick={() => onNavigateTab('favorites')}
               className="text-xs text-emerald-600 hover:underline flex items-center gap-0.5 font-medium"
             >
               常吃庫 <ChevronRight className="w-3 h-3" />
             </button>
-          </div>
-
-          <div className="flex flex-wrap gap-1.5 max-h-[110px] overflow-y-auto pr-1">
-            {favoriteFoods.slice(0, 6).map((fav) => (
-              <button
-                key={fav.id || fav.foodName}
-                onClick={() => onQuickAddFavoriteFood(fav)}
-                className="px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-xs text-slate-800 hover:text-emerald-700 transition-all text-left flex items-center justify-between gap-2 group shadow-2xs"
-                title={`點擊加入 ${fav.foodName} (${fav.calories} kcal)`}
-              >
-                <span className="font-semibold">{fav.foodName}</span>
-                <span className="text-[10px] font-bold text-emerald-600">
-                  +{fav.calories}k
-                </span>
-              </button>
-            ))}
           </div>
         </div>
 

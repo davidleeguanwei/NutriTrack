@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { 
-  auth, 
-  loginWithGoogle, 
-  loginAsGuest, 
-  logoutUser 
+import {
+  auth,
+  loginWithGoogle,
+  loginAsGuest,
+  logoutUser
 } from './lib/firebase';
-import { 
-  getUserProfile, 
-  saveUserProfile, 
-  getFoodLogsForDate, 
-  addFoodLog, 
-  deleteFoodLog, 
-  getWeightLogs, 
-  saveWeightLog, 
-  deleteWeightLog, 
-  getWaterLogForDate, 
-  updateWaterLog, 
-  getFavoriteFoods, 
-  addFavoriteFood, 
-  deleteFavoriteFood 
+import {
+  getUserProfile,
+  saveUserProfile,
+  getFoodLogsForDate,
+  addFoodLog,
+  deleteFoodLog,
+  getWeightLogs,
+  saveWeightLog,
+  deleteWeightLog,
+  getWaterLogForDate,
+  updateWaterLog,
+  getFavoriteFoods,
+  addFavoriteFood,
+  deleteFavoriteFood
 } from './lib/firestoreService';
 
 import { UserProfile, FoodLog, WeightLog, WaterLog, FavoriteFood, MealType } from './types';
@@ -60,6 +60,7 @@ export default function App() {
 
   // Modal State
   const [isAddFoodModalOpen, setIsAddFoodModalOpen] = useState(false);
+  const [activeMealType, setActiveMealType] = useState<MealType>('lunch');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // 1. Listen for Auth status
@@ -151,15 +152,20 @@ export default function App() {
   };
 
   // Data Action Handlers
+  const handleOpenAddFoodModal = (mealType: MealType = 'lunch') => {
+    setActiveMealType(mealType);
+    setIsAddFoodModalOpen(true);
+  };
+
   const handleAddFoodLog = async (
-    foodData: Omit<FoodLog, 'id'>, 
+    foodData: Omit<FoodLog, 'id'>,
     saveToFavorites: boolean
   ) => {
     if (!user) return;
     try {
       const logToAdd = { ...foodData, userId: user.uid };
       const newId = await addFoodLog(logToAdd);
-      
+
       // Update local state
       setFoodLogs((prev) => [...prev, { ...logToAdd, id: newId }]);
 
@@ -234,7 +240,7 @@ export default function App() {
     if (!user) return;
     try {
       await saveWeightLog(user.uid, date, weightKg, note);
-      
+
       // Update profile latest weight if logging for today or newest date
       if (date >= selectedDate) {
         const updatedProfile = { ...profile, weight: weightKg };
@@ -322,7 +328,7 @@ export default function App() {
 
   return (
     <div id="nutritrack-app-root" className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-      
+
       {/* Top Header Navbar */}
       <Navbar
         user={user}
@@ -362,10 +368,10 @@ export default function App() {
                 weightLogs={weightLogs}
                 favoriteFoods={favoriteFoods}
                 selectedDate={selectedDate}
-                onOpenAddFoodModal={() => setIsAddFoodModalOpen(true)}
+                onOpenAddFoodModal={() => handleOpenAddFoodModal('lunch')}
                 onUpdateWaterCups={handleUpdateWaterCups}
                 onQuickLogWeight={(w) => handleSaveWeight(selectedDate, w)}
-                onQuickAddFavoriteFood={(fav) => handleLogFavoriteToDate(fav, 'lunch')}
+                onQuickAddFavoriteFood={(fav, meal) => handleLogFavoriteToDate(fav, meal)}
                 onNavigateTab={(tab) => setActiveTab(tab)}
               />
             )}
@@ -375,7 +381,7 @@ export default function App() {
                 foodLogs={foodLogs}
                 selectedDate={selectedDate}
                 favoriteFoods={favoriteFoods}
-                onOpenAddModal={() => setIsAddFoodModalOpen(true)}
+                onOpenAddModal={(meal) => handleOpenAddFoodModal(meal || 'lunch')}
                 onDeleteLog={handleDeleteFoodLog}
                 onQuickAddFavoriteFood={(fav) => handleLogFavoriteToDate(fav, 'lunch')}
               />
@@ -424,6 +430,7 @@ export default function App() {
       <AddFoodModal
         isOpen={isAddFoodModalOpen}
         onClose={() => setIsAddFoodModalOpen(false)}
+        defaultMealType={activeMealType}
         selectedDate={selectedDate}
         favoriteFoods={favoriteFoods}
         onAddFood={handleAddFoodLog}
