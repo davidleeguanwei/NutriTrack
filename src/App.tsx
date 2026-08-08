@@ -69,6 +69,7 @@ export default function App() {
       setUser(currentUser);
       setAuthLoading(false);
 
+      /*
       if (!currentUser) {
         // Auto-signin as guest for seamless immediate preview if not signed in
         try {
@@ -77,6 +78,7 @@ export default function App() {
           console.warn('Guest sign-in fallback error:', err);
         }
       }
+      */
     });
 
     return () => unsubscribe();
@@ -316,6 +318,18 @@ export default function App() {
       console.error(err);
     }
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+        <h1 className="text-2xl font-bold mb-6">歡迎使用 NutriTrack</h1>
+        <div className="space-y-4">
+          <button onClick={handleGoogleSignIn} className="...">Google 帳號登入</button>
+          <button onClick={handleGuestSignIn} className="...">訪客快速試用</button>
+        </div>
+      </div>
+    );
+  }
 
   if (authLoading) {
     return (
